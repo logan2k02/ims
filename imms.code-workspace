@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"name": "root",
+			"path": "."
+		},
+		{
+			"path": "shared"
+		},
+		{
+			"path": "gateway"
+		},
+		{
+			"path": "products"
+		}
+	],
+	"settings": {}
+}

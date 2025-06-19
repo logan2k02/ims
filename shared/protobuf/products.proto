@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+option go_package = "github.com/theshawa/imms/shared/protobuf;protobuf";
+
+service ProductsService {
+  rpc CreateProduct (CreateProductRequest) returns (Product);
+  rpc GetProduct (GetProductRequest) returns (GetProductResponse);
+  rpc ListProducts (ListProductsRequest) returns (ListProductsResponse);
+}
+
+message CreateProductRequest {
+  string Name = 1;
+  string Description = 2;
+  double Price = 3;
+}
+
+message GetProductRequest {
+  string Id = 1;
+}
+
+message GetProductResponse {
+  Product Product = 1;
+}
+
+message Product {
+  string Id = 1;
+  string Name = 2;
+  string Description = 3;
+  double Price = 4;
+}
+
+message ListProductsRequest {
+  string Ids = 1; // Comma-separated list of product IDs(Omit if not needed)
+}
+
+message ListProductsResponse {
+  repeated Product Products = 1;
+}

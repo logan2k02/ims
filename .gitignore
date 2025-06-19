@@ -1,0 +1,39 @@
+# Go specific
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Build and binary directories
+/bin/
+/build/
+/dist/
+
+# IDE specific
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment and config
+# .env
+# *.env
+# config.local.yaml
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Dependencies
+/vendor/
+
+# Log files
+*.log
+
+# Test cache
+/testdata/
+
+*.sum
