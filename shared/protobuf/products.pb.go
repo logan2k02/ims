@@ -83,7 +83,7 @@ func (x *CreateProductRequest) GetPrice() float64 {
 
 type GetProductRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=Id,proto3" json:"Id,omitempty"`
+	Id            int64                  `protobuf:"varint,1,opt,name=Id,proto3" json:"Id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -118,11 +118,11 @@ func (*GetProductRequest) Descriptor() ([]byte, []int) {
 	return file_products_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *GetProductRequest) GetId() string {
+func (x *GetProductRequest) GetId() int64 {
 	if x != nil {
 		return x.Id
 	}
-	return ""
+	return 0
 }
 
 type GetProductResponse struct {
@@ -171,10 +171,11 @@ func (x *GetProductResponse) GetProduct() *Product {
 
 type Product struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=Id,proto3" json:"Id,omitempty"`
+	Id            int64                  `protobuf:"varint,1,opt,name=Id,proto3" json:"Id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=Name,proto3" json:"Name,omitempty"`
 	Description   string                 `protobuf:"bytes,3,opt,name=Description,proto3" json:"Description,omitempty"`
 	Price         float64                `protobuf:"fixed64,4,opt,name=Price,proto3" json:"Price,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,5,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"` // ISO 8601 format
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -209,11 +210,11 @@ func (*Product) Descriptor() ([]byte, []int) {
 	return file_products_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *Product) GetId() string {
+func (x *Product) GetId() int64 {
 	if x != nil {
 		return x.Id
 	}
-	return ""
+	return 0
 }
 
 func (x *Product) GetName() string {
@@ -237,9 +238,16 @@ func (x *Product) GetPrice() float64 {
 	return 0
 }
 
+func (x *Product) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
 type ListProductsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Ids           string                 `protobuf:"bytes,1,opt,name=Ids,proto3" json:"Ids,omitempty"` // Comma-separated list of product IDs(Omit if not needed)
+	Ids           int64                  `protobuf:"varint,1,opt,name=Ids,proto3" json:"Ids,omitempty"` // Comma-separated list of product IDs(Omit if not needed)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -274,11 +282,11 @@ func (*ListProductsRequest) Descriptor() ([]byte, []int) {
 	return file_products_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *ListProductsRequest) GetIds() string {
+func (x *ListProductsRequest) GetIds() int64 {
 	if x != nil {
 		return x.Ids
 	}
-	return ""
+	return 0
 }
 
 type ListProductsResponse struct {
@@ -335,16 +343,17 @@ const file_products_proto_rawDesc = "" +
 	"\vDescription\x18\x02 \x01(\tR\vDescription\x12\x14\n" +
 	"\x05Price\x18\x03 \x01(\x01R\x05Price\"#\n" +
 	"\x11GetProductRequest\x12\x0e\n" +
-	"\x02Id\x18\x01 \x01(\tR\x02Id\"8\n" +
+	"\x02Id\x18\x01 \x01(\x03R\x02Id\"8\n" +
 	"\x12GetProductResponse\x12\"\n" +
-	"\aProduct\x18\x01 \x01(\v2\b.ProductR\aProduct\"e\n" +
+	"\aProduct\x18\x01 \x01(\v2\b.ProductR\aProduct\"\x83\x01\n" +
 	"\aProduct\x12\x0e\n" +
-	"\x02Id\x18\x01 \x01(\tR\x02Id\x12\x12\n" +
+	"\x02Id\x18\x01 \x01(\x03R\x02Id\x12\x12\n" +
 	"\x04Name\x18\x02 \x01(\tR\x04Name\x12 \n" +
 	"\vDescription\x18\x03 \x01(\tR\vDescription\x12\x14\n" +
-	"\x05Price\x18\x04 \x01(\x01R\x05Price\"'\n" +
+	"\x05Price\x18\x04 \x01(\x01R\x05Price\x12\x1c\n" +
+	"\tCreatedAt\x18\x05 \x01(\tR\tCreatedAt\"'\n" +
 	"\x13ListProductsRequest\x12\x10\n" +
-	"\x03Ids\x18\x01 \x01(\tR\x03Ids\"<\n" +
+	"\x03Ids\x18\x01 \x01(\x03R\x03Ids\"<\n" +
 	"\x14ListProductsResponse\x12$\n" +
 	"\bProducts\x18\x01 \x03(\v2\b.ProductR\bProducts2\xb7\x01\n" +
 	"\x0fProductsService\x120\n" +

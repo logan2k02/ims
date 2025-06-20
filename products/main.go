@@ -19,7 +19,23 @@ var (
 )
 
 func main() {
-	store := NewProductsStore()
+	store, err := NewProductsStore()
+	if err != nil {
+		log.Fatalf("failed to create products store: %v", err)
+	}
+	defer func() {
+		if err := store.Close(); err != nil {
+			log.Fatalf("failed to close products store: %v", err)
+		}
+		log.Println("products store closed successfully")
+	}()
+
+	if err := store.Init(); err != nil {
+		log.Fatalf("failed to initialize products store: %v", err)
+	}
+
+	log.Println("products store initialized successfully")
+
 	service := NewProductsService(store)
 
 	consulCient, err := consul.NewClient(consulAddr)

@@ -15,7 +15,7 @@ message CreateProductRequest {
 }
 
 message GetProductRequest {
-  string Id = 1;
+  int64 Id = 1;
 }
 
 message GetProductResponse {
@@ -23,14 +23,15 @@ message GetProductResponse {
 }
 
 message Product {
-  string Id = 1;
+  int64 Id = 1;
   string Name = 2;
   string Description = 3;
   double Price = 4;
+  string CreatedAt = 5; // ISO 8601 format
 }
 
 message ListProductsRequest {
-  string Ids = 1; // Comma-separated list of product IDs(Omit if not needed)
+  int64 Ids = 1; // Comma-separated list of product IDs(Omit if not needed)
 }
 
 message ListProductsResponse {

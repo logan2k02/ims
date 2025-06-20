@@ -28,7 +28,6 @@ func NewServer(consulClient *consul.Client, serviceName string, host string, por
 	healthServer := health.NewServer()
 	grpc_health_v1.RegisterHealthServer(gRPCServer, healthServer)
 
-	healthServer.SetServingStatus(serviceName, grpc_health_v1.HealthCheckResponse_SERVING)
 	healthServer.SetServingStatus("", grpc_health_v1.HealthCheckResponse_SERVING)
 	healthServer.SetServingStatus(serviceName, grpc_health_v1.HealthCheckResponse_SERVING)
 

@@ -45,7 +45,7 @@ func (c *Client) RegisterGRPCService(serviceName string, serviceHost string, ser
 		Tags:    []string{"grpc", serviceName},
 		Check: &api.AgentServiceCheck{
 			GRPC:                           fmt.Sprintf("%s:%d", healthCheckHost, servicePort),
-			Interval:                       "10m",
+			Interval:                       "10s",
 			DeregisterCriticalServiceAfter: "1m",
 			Timeout:                        "10s",
 		},
@@ -56,37 +56,6 @@ func (c *Client) RegisterGRPCService(serviceName string, serviceHost string, ser
 	}
 
 	fmt.Printf("service %s registered successfully with consul at %s:%d\n", serviceName, serviceHost, servicePort)
-
-	return nil
-}
-
-func (c *Client) RegisterHTTPService(serviceName string, serviceHost string, servicePort int) error {
-	healthCheckHost := serviceHost
-
-	if serviceHost == "127.0.0.1" || serviceHost == "localhost" {
-		log.Printf("using 'host.docker.internal' for health check address for service %s as consul is running inside docker container\n", serviceName)
-		healthCheckHost = "host.docker.internal"
-	}
-
-	registration := &api.AgentServiceRegistration{
-		ID:      serviceName,
-		Name:    serviceName,
-		Address: serviceHost,
-		Port:    servicePort,
-		Tags:    []string{"http", serviceName},
-		Check: &api.AgentServiceCheck{
-			HTTP:                           fmt.Sprintf("http://%s:%d/health", healthCheckHost, servicePort),
-			Interval:                       "10s",
-			DeregisterCriticalServiceAfter: "1m",
-			Timeout:                        "10s",
-		},
-	}
-
-	if err := c.client.Agent().ServiceRegister(registration); err != nil {
-		return fmt.Errorf("failed to register HTTP service with consul: %w", err)
-	}
-
-	fmt.Printf("HTTP service %s registered successfully with consul at %s:%d\n", serviceName, serviceHost, servicePort)
 
 	return nil
 }

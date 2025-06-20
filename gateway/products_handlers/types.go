@@ -7,8 +7,9 @@ type createProductDto struct {
 }
 
 type product struct {
-	Id          string  `json:"id"`
+	Id          int64   `json:"id"`
 	Name        string  `json:"name"`
 	Description string  `json:"description"`
 	Price       float64 `json:"price"`
+	CreatedAt   string  `json:"created_at"`
 }

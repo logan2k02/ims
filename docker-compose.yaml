@@ -5,3 +5,15 @@ services:
       - "8500:8500"           # Web UI
       - "8600:8600/udp"       # DNS
     command: agent -dev -client=0.0.0.0
+  mysql_db:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: imms_db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: 123456
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./.docker/mysql_data:/var/lib/mysql

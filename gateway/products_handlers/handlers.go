@@ -26,7 +26,7 @@ func CreateProductHandler(productsClient *protobuf.ProductsServiceClient, valida
 			Price:       payload.Price,
 		})
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create product"})
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create product", "details": err.Error()})
 		}
 
 		product := &product{
@@ -34,6 +34,7 @@ func CreateProductHandler(productsClient *protobuf.ProductsServiceClient, valida
 			Name:        productRes.Name,
 			Description: productRes.Description,
 			Price:       productRes.Price,
+			CreatedAt:   productRes.CreatedAt,
 		}
 
 		return c.Status(fiber.StatusCreated).JSON(product)
