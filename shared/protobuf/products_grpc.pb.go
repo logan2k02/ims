@@ -29,7 +29,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProductsServiceClient interface {
 	CreateProduct(ctx context.Context, in *CreateProductRequest, opts ...grpc.CallOption) (*Product, error)
-	GetProduct(ctx context.Context, in *GetProductRequest, opts ...grpc.CallOption) (*GetProductResponse, error)
+	GetProduct(ctx context.Context, in *GetProductRequest, opts ...grpc.CallOption) (*Product, error)
 	ListProducts(ctx context.Context, in *ListProductsRequest, opts ...grpc.CallOption) (*ListProductsResponse, error)
 }
 
@@ -51,9 +51,9 @@ func (c *productsServiceClient) CreateProduct(ctx context.Context, in *CreatePro
 	return out, nil
 }
 
-func (c *productsServiceClient) GetProduct(ctx context.Context, in *GetProductRequest, opts ...grpc.CallOption) (*GetProductResponse, error) {
+func (c *productsServiceClient) GetProduct(ctx context.Context, in *GetProductRequest, opts ...grpc.CallOption) (*Product, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetProductResponse)
+	out := new(Product)
 	err := c.cc.Invoke(ctx, ProductsService_GetProduct_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -76,7 +76,7 @@ func (c *productsServiceClient) ListProducts(ctx context.Context, in *ListProduc
 // for forward compatibility.
 type ProductsServiceServer interface {
 	CreateProduct(context.Context, *CreateProductRequest) (*Product, error)
-	GetProduct(context.Context, *GetProductRequest) (*GetProductResponse, error)
+	GetProduct(context.Context, *GetProductRequest) (*Product, error)
 	ListProducts(context.Context, *ListProductsRequest) (*ListProductsResponse, error)
 	mustEmbedUnimplementedProductsServiceServer()
 }
@@ -91,7 +91,7 @@ type UnimplementedProductsServiceServer struct{}
 func (UnimplementedProductsServiceServer) CreateProduct(context.Context, *CreateProductRequest) (*Product, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateProduct not implemented")
 }
-func (UnimplementedProductsServiceServer) GetProduct(context.Context, *GetProductRequest) (*GetProductResponse, error) {
+func (UnimplementedProductsServiceServer) GetProduct(context.Context, *GetProductRequest) (*Product, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProduct not implemented")
 }
 func (UnimplementedProductsServiceServer) ListProducts(context.Context, *ListProductsRequest) (*ListProductsResponse, error) {

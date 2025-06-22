@@ -3,7 +3,7 @@ package grpcservice
 import (
 	"fmt"
 
-	"github.com/theshawa/imms/shared/consul"
+	"github.com/theshawa/ims/shared/consul"
 	"google.golang.org/grpc"
 
 	"google.golang.org/grpc/credentials/insecure"

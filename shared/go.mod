@@ -1,4 +1,4 @@
-module github.com/theshawa/imms/shared
+module github.com/theshawa/ims/shared
 
 go 1.24.4
 

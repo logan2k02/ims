@@ -1,4 +1,4 @@
-module github.com/theshawa/imms/gateway
+module github.com/theshawa/ims/gateway
 
 go 1.24.4
 
