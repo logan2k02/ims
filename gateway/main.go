@@ -4,10 +4,10 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/theshawa/ims/shared/consul"
-	"github.com/theshawa/ims/shared/grpcservice"
-	"github.com/theshawa/ims/shared/protobuf"
-	"github.com/theshawa/ims/shared/utils"
+	"github.com/logan2k02/ims/shared/consul"
+	"github.com/logan2k02/ims/shared/grpcservice"
+	"github.com/logan2k02/ims/shared/protobuf"
+	"github.com/logan2k02/ims/shared/utils"
 )
 
 var (

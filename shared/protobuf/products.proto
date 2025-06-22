@@ -1,11 +1,13 @@
 syntax = "proto3";
 
-option go_package = "github.com/theshawa/ims/shared/protobuf;protobuf";
+option go_package = "github.com/logan2k02/ims/shared/protobuf;protobuf";
 
 service ProductsService {
   rpc CreateProduct (CreateProductRequest) returns (Product);
-  rpc GetProduct (GetProductRequest) returns (Product);
+  rpc GetProduct (ProductIdRequest) returns (Product);
   rpc ListProducts (ListProductsRequest) returns (ListProductsResponse);
+  rpc DeleteProduct(ProductIdRequest) returns (DeleteProductResponse);
+  rpc UpdateProduct(UpdateProductRequest) returns (Product);
 }
 
 message CreateProductRequest {
@@ -14,7 +16,7 @@ message CreateProductRequest {
   double Price = 3;
 }
 
-message GetProductRequest {
+message ProductIdRequest {
   int64 Id = 1;
 }
 
@@ -27,9 +29,18 @@ message Product {
 }
 
 message ListProductsRequest {
-  repeated int64 Ids = 1; // Comma-separated list of product IDs(Omit if not needed)
+  repeated int64 Ids = 1;
 }
 
 message ListProductsResponse {
   repeated Product Products = 1;
+}
+
+message DeleteProductResponse {}
+
+message UpdateProductRequest {
+  int64 Id = 1;
+  string Name = 2;
+  string Description = 3;
+  double Price = 4;
 }

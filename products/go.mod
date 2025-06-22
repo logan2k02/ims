@@ -1,11 +1,11 @@
-module github.com/theshawa/ims/products
+module github.com/logan2k02/ims/products
 
 go 1.24.4
 
 require (
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/joho/godotenv v1.5.1
-	github.com/theshawa/ims/shared v0.0.0-20250619183832-447e5203b50a
+	github.com/logan2k02/ims/shared v0.0.0-20250622041756-8e6502fb592c
 	google.golang.org/grpc v1.73.0
 )
 
@@ -27,9 +27,9 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
-	golang.org/x/net v0.38.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
-	golang.org/x/text v0.23.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250324211829-b45e905df463 // indirect
+	golang.org/x/net v0.41.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
+	golang.org/x/text v0.26.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250603155806-513f23925822 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 )

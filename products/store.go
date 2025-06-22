@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/theshawa/ims/shared/protobuf"
-	"github.com/theshawa/ims/shared/utils"
+	pb "github.com/logan2k02/ims/shared/protobuf"
+	"github.com/logan2k02/ims/shared/utils"
 )
 
 type productsStore struct {
@@ -17,7 +17,7 @@ type productsStore struct {
 
 var (
 	dbHost     = utils.GetEnv("DB_HOST", "localhost")
-	dbPort     = utils.GetEnv("DB_PORT", "5432")
+	dbPort     = utils.GetEnv("DB_PORT", "3306")
 	dbUser     = utils.GetEnv("DB_USER", "admin")
 	dbPassword = utils.GetEnv("DB_PASSWORD", "123456")
 	dbName     = utils.GetEnv("DB_NAME", "ims_db")
@@ -33,12 +33,12 @@ func NewProductsStore() (*productsStore, error) {
 
 	conn, err := sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to db due to an error: %v", err)
+		return nil, err
 	}
 
 	// ping
 	if err := conn.Ping(); err != nil {
-		return nil, fmt.Errorf("failed to connect to database: %w", err)
+		return nil, err
 	}
 
 	return &productsStore{
@@ -64,28 +64,28 @@ func (s *productsStore) Init() error {
 	);
 	`)
 	if err != nil {
-		return fmt.Errorf("failed to initialize products table: %w", err)
+		return err
 	}
 
 	return nil
 }
 
-func rowToProduct(row *sql.Row) (*protobuf.Product, error) {
-	var product protobuf.Product
+func rowToProduct(row *sql.Row) (*pb.Product, error) {
+	var product pb.Product
 	if err := row.Scan(&product.Id, &product.Name, &product.Description, &product.Price, &product.CreatedAt); err != nil {
-		return nil, fmt.Errorf("failed to scan product row: %w", err)
+		return nil, err
 	}
 	return &product, nil
 }
 
-func (s *productsStore) CreateProduct(ctx context.Context, payload *protobuf.CreateProductRequest) (*protobuf.Product, error) {
+func (s *productsStore) CreateProduct(ctx context.Context, payload *pb.CreateProductRequest) (*pb.Product, error) {
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to begin transaction: %w", err)
+		return nil, err
 	}
 	defer func() {
 		if err := tx.Rollback(); err != nil && err != sql.ErrTxDone {
-			fmt.Printf("failed to rollback transaction: %v\n", err)
+			Logger.LogError("create product", "failed to rollback transaction: %v", err)
 		}
 	}()
 
@@ -96,12 +96,12 @@ func (s *productsStore) CreateProduct(ctx context.Context, payload *protobuf.Cre
 
 	result, err := tx.ExecContext(ctx, query, payload.Name, payload.Description, payload.Price)
 	if err != nil {
-		return nil, fmt.Errorf("failed to make query: %w", err)
+		return nil, err
 	}
 
 	insertedId, err := result.LastInsertId()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get last insert id: %w", err)
+		return nil, err
 	}
 
 	row := tx.QueryRowContext(ctx, `SELECT id, name, description, price, created_at FROM products WHERE id = ?`, insertedId)
@@ -112,20 +112,20 @@ func (s *productsStore) CreateProduct(ctx context.Context, payload *protobuf.Cre
 	}
 
 	if err := tx.Commit(); err != nil {
-		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+		return nil, err
 	}
 
 	return insertedProduct, nil
 }
 
-func (s *productsStore) GetProducts(ctx context.Context, ids []int64) ([]*protobuf.Product, error) {
+func (s *productsStore) GetProducts(ctx context.Context, ids []int64) ([]*pb.Product, error) {
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to begin transaction: %w", err)
+		return nil, err
 	}
 	defer func() {
 		if err := tx.Rollback(); err != nil && err != sql.ErrTxDone {
-			fmt.Printf("failed to rollback transaction: %v\n", err)
+			Logger.LogError("get products", "failed to rollback transaction: %v", err)
 		}
 	}()
 
@@ -142,21 +142,82 @@ func (s *productsStore) GetProducts(ctx context.Context, ids []int64) ([]*protob
 
 	rows, err := tx.QueryContext(ctx, query, args...)
 	if err != nil {
-		return nil, fmt.Errorf("failed to make query: %w", err)
+		return nil, err
 	}
 	defer rows.Close()
 
-	var products []*protobuf.Product
+	var products []*pb.Product
 	for rows.Next() {
-		var product protobuf.Product
+		var product pb.Product
 		if err := rows.Scan(&product.Id, &product.Name, &product.Description, &product.Price, &product.CreatedAt); err != nil {
-			return nil, fmt.Errorf("failed to scan product row: %w", err)
+			return nil, err
 		}
 		products = append(products, &product)
 	}
 	if err = rows.Err(); err != nil {
-		return nil, fmt.Errorf("failed to scan rows: %w", err)
+		return nil, err
 	}
 
 	return products, nil
+}
+
+func (s *productsStore) DeleteProduct(ctx context.Context, id int64) error {
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err := tx.Rollback(); err != nil && err != sql.ErrTxDone {
+			Logger.LogError("delete product", "failed to rollback transaction: %v", err)
+		}
+	}()
+
+	query := "DELETE FROM products WHERE id = ?"
+
+	_, err = tx.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *productsStore) UpdateProduct(ctx context.Context, payload *pb.UpdateProductRequest) (*pb.Product, error) {
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if err := tx.Rollback(); err != nil && err != sql.ErrTxDone {
+			Logger.LogError("update product", "failed to rollback transaction: %v", err)
+		}
+	}()
+
+	query := `
+	UPDATE products
+	SET name = ?, description = ?, price = ?
+	WHERE id = ?
+	`
+
+	_, err = tx.ExecContext(ctx, query, payload.Name, payload.Description, payload.Price, payload.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	row := tx.QueryRowContext(ctx, `SELECT id, name, description, price, created_at FROM products WHERE id = ?`, payload.Id)
+
+	updatedProduct, err := rowToProduct(row)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+
+	return updatedProduct, nil
 }
