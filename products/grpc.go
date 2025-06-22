@@ -19,8 +19,8 @@ func NewProductsGRPCHandler(service *productsService) *productsGRPCHandler {
 	}
 }
 
-func (s *productsGRPCHandler) CreateProduct(ctx context.Context, payload *pb.CreateProductRequest) (*pb.Product, error) {
-	product, err := s.service.CreateProduct(ctx, payload)
+func (h *productsGRPCHandler) CreateProduct(ctx context.Context, payload *pb.CreateProductRequest) (*pb.Product, error) {
+	product, err := h.service.CreateProduct(ctx, payload)
 
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -29,8 +29,8 @@ func (s *productsGRPCHandler) CreateProduct(ctx context.Context, payload *pb.Cre
 	return product, nil
 }
 
-func (s *productsGRPCHandler) GetProduct(ctx context.Context, payload *pb.ProductIdRequest) (*pb.Product, error) {
-	product, err := s.service.GetProduct(ctx, payload)
+func (h *productsGRPCHandler) GetProduct(ctx context.Context, payload *pb.ProductIdRequest) (*pb.Product, error) {
+	product, err := h.service.GetProduct(ctx, payload)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -42,8 +42,8 @@ func (s *productsGRPCHandler) GetProduct(ctx context.Context, payload *pb.Produc
 	return product, nil
 }
 
-func (s *productsGRPCHandler) ListProducts(ctx context.Context, payload *pb.ListProductsRequest) (*pb.ListProductsResponse, error) {
-	products, err := s.service.GetProducts(ctx, payload)
+func (h *productsGRPCHandler) ListProducts(ctx context.Context, payload *pb.ListProductsRequest) (*pb.ListProductsResponse, error) {
+	products, err := h.service.GetProducts(ctx, payload)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -53,16 +53,16 @@ func (s *productsGRPCHandler) ListProducts(ctx context.Context, payload *pb.List
 	}, nil
 }
 
-func (s *productsGRPCHandler) DeleteProduct(ctx context.Context, payload *pb.ProductIdRequest) (*pb.DeleteProductResponse, error) {
-	if err := s.service.DeleteProduct(ctx, payload); err != nil {
+func (h *productsGRPCHandler) DeleteProduct(ctx context.Context, payload *pb.ProductIdRequest) (*pb.DeleteProductResponse, error) {
+	if err := h.service.DeleteProduct(ctx, payload); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &pb.DeleteProductResponse{}, nil
 }
 
-func (s *productsGRPCHandler) UpdateProduct(ctx context.Context, payload *pb.UpdateProductRequest) (*pb.Product, error) {
-	product, err := s.service.UpdateProduct(ctx, payload)
+func (h *productsGRPCHandler) UpdateProduct(ctx context.Context, payload *pb.UpdateProductRequest) (*pb.Product, error) {
+	product, err := h.service.UpdateProduct(ctx, payload)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

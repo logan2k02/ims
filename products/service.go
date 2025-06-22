@@ -24,18 +24,13 @@ func (s *productsService) CreateProduct(ctx context.Context, payload *pb.CreateP
 }
 
 func (s *productsService) GetProducts(ctx context.Context, payload *pb.ListProductsRequest) ([]*pb.Product, error) {
-	products, err := s.store.GetProducts(ctx, payload.Ids)
-	if err != nil {
-		return nil, err
-	}
-	return products, nil
+	return s.store.GetProducts(ctx, payload.Ids)
 }
 
 func (s *productsService) GetProduct(ctx context.Context, payload *pb.ProductIdRequest) (*pb.Product, error) {
 	products, err := s.store.GetProducts(ctx, []int64{
 		payload.Id,
 	})
-
 	if err != nil {
 		return nil, err
 	}
@@ -57,5 +52,5 @@ func (s *productsService) UpdateProduct(ctx context.Context, payload *pb.UpdateP
 		return nil, err
 	}
 
-	return product, nil
+	return product, err
 }

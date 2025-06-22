@@ -10,9 +10,9 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func CreateProductHandler(productsClient *pb.ProductsServiceClient, validate *validator.Validate) fiber.Handler {
+func CreateProductHandler(productsClient pb.ProductsServiceClient, validate *validator.Validate) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var payload manageProductDto
+		var payload createProductDto
 		if err := c.BodyParser(&payload); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid request body"})
 		}
@@ -24,28 +24,36 @@ func CreateProductHandler(productsClient *pb.ProductsServiceClient, validate *va
 			})
 		}
 
-		productRes, err := (*productsClient).CreateProduct(c.Context(), &pb.CreateProductRequest{
-			Name:        payload.Name,
-			Description: payload.Description,
-			Price:       payload.Price,
+		productRes, err := productsClient.CreateProduct(c.Context(), &pb.CreateProductRequest{
+			Name:            payload.Name,
+			Sku:             payload.Sku,
+			Description:     payload.Description,
+			Price:           payload.Price,
+			ReorderLevel:    payload.ReorderLevel,
+			ReorderQuantity: payload.ReorderQuantity,
+			InitialQuantity: payload.InitialQuantity,
 		})
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create product", "details": status.Convert(err).Message()})
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "failed to create product", "details": status.Convert(err).Message()})
 		}
 
 		product := &product{
-			Id:          productRes.Id,
-			Name:        productRes.Name,
-			Description: productRes.Description,
-			Price:       productRes.Price,
-			CreatedAt:   productRes.CreatedAt,
+			Id:              productRes.Id,
+			Name:            productRes.Name,
+			Sku:             productRes.Sku,
+			Description:     productRes.Description,
+			Price:           productRes.Price,
+			CreatedAt:       productRes.CreatedAt,
+			ReorderLevel:    productRes.ReorderLevel,
+			ReorderQuantity: payload.ReorderQuantity,
+			StockQuantity:   productRes.StockQuantity,
 		}
 
 		return c.Status(fiber.StatusCreated).JSON(product)
 	}
 }
 
-func GetProduct(productsClient *pb.ProductsServiceClient) fiber.Handler {
+func GetProduct(productsClient pb.ProductsServiceClient) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		idParam := c.Params("id", "1")
 		id, err := strconv.ParseInt(idParam, 10, 64)
@@ -56,32 +64,36 @@ func GetProduct(productsClient *pb.ProductsServiceClient) fiber.Handler {
 			})
 		}
 
-		productRes, err := (*productsClient).GetProduct(c.Context(), &pb.ProductIdRequest{
+		productRes, err := productsClient.GetProduct(c.Context(), &pb.ProductIdRequest{
 			Id: id,
 		})
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to get product", "details": status.Convert(err).Message()})
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "failed to get product", "details": status.Convert(err).Message()})
 		}
 
 		product := &product{
-			Id:          productRes.Id,
-			Name:        productRes.Name,
-			Description: productRes.Description,
-			Price:       productRes.Price,
-			CreatedAt:   productRes.CreatedAt,
+			Id:              productRes.Id,
+			Name:            productRes.Name,
+			Sku:             productRes.Sku,
+			Description:     productRes.Description,
+			Price:           productRes.Price,
+			CreatedAt:       productRes.CreatedAt,
+			ReorderLevel:    productRes.ReorderLevel,
+			ReorderQuantity: productRes.ReorderQuantity,
+			StockQuantity:   productRes.StockQuantity,
 		}
 
 		return c.Status(fiber.StatusCreated).JSON(product)
 	}
 }
 
-func ListProducts(productsClient *pb.ProductsServiceClient) fiber.Handler {
+func ListProducts(productsClient pb.ProductsServiceClient) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		idsParam := c.Query("ids", "")
 		var ids []int64
 		if idsParam != "" {
-			idStrings := strings.Split(idsParam, ",")
-			for _, idStr := range idStrings {
+			idStrings := strings.SplitSeq(idsParam, ",")
+			for idStr := range idStrings {
 				id, err := strconv.ParseInt(idStr, 10, 64)
 				if err != nil {
 					return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -93,21 +105,25 @@ func ListProducts(productsClient *pb.ProductsServiceClient) fiber.Handler {
 			}
 		}
 
-		productRes, err := (*productsClient).ListProducts(c.Context(), &pb.ListProductsRequest{
+		productRes, err := productsClient.ListProducts(c.Context(), &pb.ListProductsRequest{
 			Ids: ids,
 		})
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to get products", "details": status.Convert(err).Message()})
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "failed to get products", "details": status.Convert(err).Message()})
 		}
 
 		var products []*product
 		for _, p := range productRes.Products {
 			product := &product{
-				Id:          p.Id,
-				Name:        p.Name,
-				Description: p.Description,
-				Price:       p.Price,
-				CreatedAt:   p.CreatedAt,
+				Id:              p.Id,
+				Name:            p.Name,
+				Sku:             p.Sku,
+				Description:     p.Description,
+				Price:           p.Price,
+				CreatedAt:       p.CreatedAt,
+				ReorderLevel:    p.ReorderLevel,
+				ReorderQuantity: p.ReorderQuantity,
+				StockQuantity:   p.StockQuantity,
 			}
 			products = append(products, product)
 		}
@@ -116,7 +132,7 @@ func ListProducts(productsClient *pb.ProductsServiceClient) fiber.Handler {
 	}
 }
 
-func DeleteProduct(productsClient *pb.ProductsServiceClient) fiber.Handler {
+func DeleteProduct(productsClient pb.ProductsServiceClient) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		idParam := c.Params("id", "1")
 		id, err := strconv.ParseInt(idParam, 10, 64)
@@ -127,7 +143,7 @@ func DeleteProduct(productsClient *pb.ProductsServiceClient) fiber.Handler {
 			})
 		}
 
-		if _, err := (*productsClient).DeleteProduct(c.Context(), &pb.ProductIdRequest{
+		if _, err := productsClient.DeleteProduct(c.Context(), &pb.ProductIdRequest{
 			Id: id,
 		}); err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "failed to delete product", "details": status.Convert(err).Message()})
@@ -137,7 +153,7 @@ func DeleteProduct(productsClient *pb.ProductsServiceClient) fiber.Handler {
 	}
 }
 
-func UpdateProduct(productsClient *pb.ProductsServiceClient, validate *validator.Validate) fiber.Handler {
+func UpdateProduct(productsClient pb.ProductsServiceClient, validate *validator.Validate) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		idParam := c.Params("id", "1")
 		id, err := strconv.ParseInt(idParam, 10, 64)
@@ -148,7 +164,7 @@ func UpdateProduct(productsClient *pb.ProductsServiceClient, validate *validator
 			})
 		}
 
-		var payload manageProductDto
+		var payload updateProductDto
 		if err := c.BodyParser(&payload); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid request body"})
 		}
@@ -160,22 +176,29 @@ func UpdateProduct(productsClient *pb.ProductsServiceClient, validate *validator
 			})
 		}
 
-		productRes, err := (*productsClient).UpdateProduct(c.Context(), &pb.UpdateProductRequest{
-			Id:          id,
-			Name:        payload.Name,
-			Description: payload.Description,
-			Price:       payload.Price,
+		productRes, err := productsClient.UpdateProduct(c.Context(), &pb.UpdateProductRequest{
+			Id:              id,
+			Name:            payload.Name,
+			Sku:             payload.Sku,
+			Description:     payload.Description,
+			Price:           payload.Price,
+			ReorderLevel:    payload.ReorderLevel,
+			ReorderQuantity: payload.ReorderQuantity,
 		})
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "failed to update product", "details": status.Convert(err).Message()})
 		}
 
 		product := &product{
-			Id:          productRes.Id,
-			Name:        productRes.Name,
-			Description: productRes.Description,
-			Price:       productRes.Price,
-			CreatedAt:   productRes.CreatedAt,
+			Id:              productRes.Id,
+			Name:            productRes.Name,
+			Sku:             payload.Sku,
+			Description:     productRes.Description,
+			Price:           productRes.Price,
+			CreatedAt:       productRes.CreatedAt,
+			ReorderLevel:    productRes.ReorderLevel,
+			ReorderQuantity: productRes.ReorderQuantity,
+			StockQuantity:   productRes.StockQuantity,
 		}
 
 		return c.Status(fiber.StatusOK).JSON(product)

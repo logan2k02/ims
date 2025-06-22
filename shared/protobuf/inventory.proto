@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+option go_package = "github.com/logan2k02/ims/shared/protobuf;protobuf";
+
+service InventoryService {
+  rpc PurchaseInventoryProduct (PurchaseInventoryRequest) returns (StockMovement);
+  rpc SupplyInventoryProduct (ManageInventoryRequest) returns (StockMovement);
+  
+  rpc CorrectInventoryStock(ManageInventoryRequest) returns (StockMovement);
+
+  rpc ListStockMovements (ListStockMovementsRequest) returns (ListStockMovementsResponse);
+}
+
+message PurchaseInventoryRequest {
+  int64 ProductId = 1;
+  int64 Quantity = 2;
+  string Reference = 3;
+}
+
+message StockMovement {
+  int64 Id = 1;
+  int64 ProductId = 2;
+  int64 Change = 3;
+  string Type = 4;
+  string Reference = 5;
+  string Note = 6;
+  string CreatedAt = 7;
+}
+
+message ManageInventoryRequest{
+  int64 ProductId = 1;
+  int64 Quantity = 2;
+  string Note = 3;
+}
+
+message ListStockMovementsRequest {
+  int64 ProductId = 1;
+}
+
+message ListStockMovementsResponse {
+  repeated StockMovement Records = 1;
+}

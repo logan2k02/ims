@@ -12,8 +12,12 @@ service ProductsService {
 
 message CreateProductRequest {
   string Name = 1;
-  string Description = 2;
-  double Price = 3;
+  string Sku = 2;
+  string Description = 3;
+  double Price = 4;
+  int64 ReorderLevel = 5;
+  int64 ReorderQuantity = 6;
+  int64 InitialQuantity = 7;
 }
 
 message ProductIdRequest {
@@ -23,9 +27,13 @@ message ProductIdRequest {
 message Product {
   int64 Id = 1;
   string Name = 2;
-  string Description = 3;
-  double Price = 4;
-  string CreatedAt = 5; // ISO 8601 format
+  string Sku = 3;
+  string Description = 4;
+  double Price = 5;
+  string CreatedAt = 6;
+  int64 ReorderLevel = 7;
+  int64 ReorderQuantity = 8;
+  int64 StockQuantity = 9;
 }
 
 message ListProductsRequest {
@@ -41,6 +49,9 @@ message DeleteProductResponse {}
 message UpdateProductRequest {
   int64 Id = 1;
   string Name = 2;
-  string Description = 3;
-  double Price = 4;
+  string Sku = 3;
+  string Description = 4;
+  double Price = 5;
+  int64 ReorderLevel = 6;
+  int64 ReorderQuantity = 7;
 }

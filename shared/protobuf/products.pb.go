@@ -22,12 +22,16 @@ const (
 )
 
 type CreateProductRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`
-	Description   string                 `protobuf:"bytes,2,opt,name=Description,proto3" json:"Description,omitempty"`
-	Price         float64                `protobuf:"fixed64,3,opt,name=Price,proto3" json:"Price,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Name            string                 `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`
+	Sku             string                 `protobuf:"bytes,2,opt,name=Sku,proto3" json:"Sku,omitempty"`
+	Description     string                 `protobuf:"bytes,3,opt,name=Description,proto3" json:"Description,omitempty"`
+	Price           float64                `protobuf:"fixed64,4,opt,name=Price,proto3" json:"Price,omitempty"`
+	ReorderLevel    int64                  `protobuf:"varint,5,opt,name=ReorderLevel,proto3" json:"ReorderLevel,omitempty"`
+	ReorderQuantity int64                  `protobuf:"varint,6,opt,name=ReorderQuantity,proto3" json:"ReorderQuantity,omitempty"`
+	InitialQuantity int64                  `protobuf:"varint,7,opt,name=InitialQuantity,proto3" json:"InitialQuantity,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *CreateProductRequest) Reset() {
@@ -67,6 +71,13 @@ func (x *CreateProductRequest) GetName() string {
 	return ""
 }
 
+func (x *CreateProductRequest) GetSku() string {
+	if x != nil {
+		return x.Sku
+	}
+	return ""
+}
+
 func (x *CreateProductRequest) GetDescription() string {
 	if x != nil {
 		return x.Description
@@ -77,6 +88,27 @@ func (x *CreateProductRequest) GetDescription() string {
 func (x *CreateProductRequest) GetPrice() float64 {
 	if x != nil {
 		return x.Price
+	}
+	return 0
+}
+
+func (x *CreateProductRequest) GetReorderLevel() int64 {
+	if x != nil {
+		return x.ReorderLevel
+	}
+	return 0
+}
+
+func (x *CreateProductRequest) GetReorderQuantity() int64 {
+	if x != nil {
+		return x.ReorderQuantity
+	}
+	return 0
+}
+
+func (x *CreateProductRequest) GetInitialQuantity() int64 {
+	if x != nil {
+		return x.InitialQuantity
 	}
 	return 0
 }
@@ -126,14 +158,18 @@ func (x *ProductIdRequest) GetId() int64 {
 }
 
 type Product struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=Id,proto3" json:"Id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=Name,proto3" json:"Name,omitempty"`
-	Description   string                 `protobuf:"bytes,3,opt,name=Description,proto3" json:"Description,omitempty"`
-	Price         float64                `protobuf:"fixed64,4,opt,name=Price,proto3" json:"Price,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,5,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"` // ISO 8601 format
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Id              int64                  `protobuf:"varint,1,opt,name=Id,proto3" json:"Id,omitempty"`
+	Name            string                 `protobuf:"bytes,2,opt,name=Name,proto3" json:"Name,omitempty"`
+	Sku             string                 `protobuf:"bytes,3,opt,name=Sku,proto3" json:"Sku,omitempty"`
+	Description     string                 `protobuf:"bytes,4,opt,name=Description,proto3" json:"Description,omitempty"`
+	Price           float64                `protobuf:"fixed64,5,opt,name=Price,proto3" json:"Price,omitempty"`
+	CreatedAt       string                 `protobuf:"bytes,6,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`
+	ReorderLevel    int64                  `protobuf:"varint,7,opt,name=ReorderLevel,proto3" json:"ReorderLevel,omitempty"`
+	ReorderQuantity int64                  `protobuf:"varint,8,opt,name=ReorderQuantity,proto3" json:"ReorderQuantity,omitempty"`
+	StockQuantity   int64                  `protobuf:"varint,9,opt,name=StockQuantity,proto3" json:"StockQuantity,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *Product) Reset() {
@@ -180,6 +216,13 @@ func (x *Product) GetName() string {
 	return ""
 }
 
+func (x *Product) GetSku() string {
+	if x != nil {
+		return x.Sku
+	}
+	return ""
+}
+
 func (x *Product) GetDescription() string {
 	if x != nil {
 		return x.Description
@@ -199,6 +242,27 @@ func (x *Product) GetCreatedAt() string {
 		return x.CreatedAt
 	}
 	return ""
+}
+
+func (x *Product) GetReorderLevel() int64 {
+	if x != nil {
+		return x.ReorderLevel
+	}
+	return 0
+}
+
+func (x *Product) GetReorderQuantity() int64 {
+	if x != nil {
+		return x.ReorderQuantity
+	}
+	return 0
+}
+
+func (x *Product) GetStockQuantity() int64 {
+	if x != nil {
+		return x.StockQuantity
+	}
+	return 0
 }
 
 type ListProductsRequest struct {
@@ -326,13 +390,16 @@ func (*DeleteProductResponse) Descriptor() ([]byte, []int) {
 }
 
 type UpdateProductRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=Id,proto3" json:"Id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=Name,proto3" json:"Name,omitempty"`
-	Description   string                 `protobuf:"bytes,3,opt,name=Description,proto3" json:"Description,omitempty"`
-	Price         float64                `protobuf:"fixed64,4,opt,name=Price,proto3" json:"Price,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Id              int64                  `protobuf:"varint,1,opt,name=Id,proto3" json:"Id,omitempty"`
+	Name            string                 `protobuf:"bytes,2,opt,name=Name,proto3" json:"Name,omitempty"`
+	Sku             string                 `protobuf:"bytes,3,opt,name=Sku,proto3" json:"Sku,omitempty"`
+	Description     string                 `protobuf:"bytes,4,opt,name=Description,proto3" json:"Description,omitempty"`
+	Price           float64                `protobuf:"fixed64,5,opt,name=Price,proto3" json:"Price,omitempty"`
+	ReorderLevel    int64                  `protobuf:"varint,6,opt,name=ReorderLevel,proto3" json:"ReorderLevel,omitempty"`
+	ReorderQuantity int64                  `protobuf:"varint,7,opt,name=ReorderQuantity,proto3" json:"ReorderQuantity,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *UpdateProductRequest) Reset() {
@@ -379,6 +446,13 @@ func (x *UpdateProductRequest) GetName() string {
 	return ""
 }
 
+func (x *UpdateProductRequest) GetSku() string {
+	if x != nil {
+		return x.Sku
+	}
+	return ""
+}
+
 func (x *UpdateProductRequest) GetDescription() string {
 	if x != nil {
 		return x.Description
@@ -393,33 +467,58 @@ func (x *UpdateProductRequest) GetPrice() float64 {
 	return 0
 }
 
+func (x *UpdateProductRequest) GetReorderLevel() int64 {
+	if x != nil {
+		return x.ReorderLevel
+	}
+	return 0
+}
+
+func (x *UpdateProductRequest) GetReorderQuantity() int64 {
+	if x != nil {
+		return x.ReorderQuantity
+	}
+	return 0
+}
+
 var File_products_proto protoreflect.FileDescriptor
 
 const file_products_proto_rawDesc = "" +
 	"\n" +
-	"\x0eproducts.proto\"b\n" +
+	"\x0eproducts.proto\"\xec\x01\n" +
 	"\x14CreateProductRequest\x12\x12\n" +
-	"\x04Name\x18\x01 \x01(\tR\x04Name\x12 \n" +
-	"\vDescription\x18\x02 \x01(\tR\vDescription\x12\x14\n" +
-	"\x05Price\x18\x03 \x01(\x01R\x05Price\"\"\n" +
+	"\x04Name\x18\x01 \x01(\tR\x04Name\x12\x10\n" +
+	"\x03Sku\x18\x02 \x01(\tR\x03Sku\x12 \n" +
+	"\vDescription\x18\x03 \x01(\tR\vDescription\x12\x14\n" +
+	"\x05Price\x18\x04 \x01(\x01R\x05Price\x12\"\n" +
+	"\fReorderLevel\x18\x05 \x01(\x03R\fReorderLevel\x12(\n" +
+	"\x0fReorderQuantity\x18\x06 \x01(\x03R\x0fReorderQuantity\x12(\n" +
+	"\x0fInitialQuantity\x18\a \x01(\x03R\x0fInitialQuantity\"\"\n" +
 	"\x10ProductIdRequest\x12\x0e\n" +
-	"\x02Id\x18\x01 \x01(\x03R\x02Id\"\x83\x01\n" +
+	"\x02Id\x18\x01 \x01(\x03R\x02Id\"\x89\x02\n" +
 	"\aProduct\x12\x0e\n" +
 	"\x02Id\x18\x01 \x01(\x03R\x02Id\x12\x12\n" +
-	"\x04Name\x18\x02 \x01(\tR\x04Name\x12 \n" +
-	"\vDescription\x18\x03 \x01(\tR\vDescription\x12\x14\n" +
-	"\x05Price\x18\x04 \x01(\x01R\x05Price\x12\x1c\n" +
-	"\tCreatedAt\x18\x05 \x01(\tR\tCreatedAt\"'\n" +
+	"\x04Name\x18\x02 \x01(\tR\x04Name\x12\x10\n" +
+	"\x03Sku\x18\x03 \x01(\tR\x03Sku\x12 \n" +
+	"\vDescription\x18\x04 \x01(\tR\vDescription\x12\x14\n" +
+	"\x05Price\x18\x05 \x01(\x01R\x05Price\x12\x1c\n" +
+	"\tCreatedAt\x18\x06 \x01(\tR\tCreatedAt\x12\"\n" +
+	"\fReorderLevel\x18\a \x01(\x03R\fReorderLevel\x12(\n" +
+	"\x0fReorderQuantity\x18\b \x01(\x03R\x0fReorderQuantity\x12$\n" +
+	"\rStockQuantity\x18\t \x01(\x03R\rStockQuantity\"'\n" +
 	"\x13ListProductsRequest\x12\x10\n" +
 	"\x03Ids\x18\x01 \x03(\x03R\x03Ids\"<\n" +
 	"\x14ListProductsResponse\x12$\n" +
 	"\bProducts\x18\x01 \x03(\v2\b.ProductR\bProducts\"\x17\n" +
-	"\x15DeleteProductResponse\"r\n" +
+	"\x15DeleteProductResponse\"\xd2\x01\n" +
 	"\x14UpdateProductRequest\x12\x0e\n" +
 	"\x02Id\x18\x01 \x01(\x03R\x02Id\x12\x12\n" +
-	"\x04Name\x18\x02 \x01(\tR\x04Name\x12 \n" +
-	"\vDescription\x18\x03 \x01(\tR\vDescription\x12\x14\n" +
-	"\x05Price\x18\x04 \x01(\x01R\x05Price2\x99\x02\n" +
+	"\x04Name\x18\x02 \x01(\tR\x04Name\x12\x10\n" +
+	"\x03Sku\x18\x03 \x01(\tR\x03Sku\x12 \n" +
+	"\vDescription\x18\x04 \x01(\tR\vDescription\x12\x14\n" +
+	"\x05Price\x18\x05 \x01(\x01R\x05Price\x12\"\n" +
+	"\fReorderLevel\x18\x06 \x01(\x03R\fReorderLevel\x12(\n" +
+	"\x0fReorderQuantity\x18\a \x01(\x03R\x0fReorderQuantity2\x99\x02\n" +
 	"\x0fProductsService\x120\n" +
 	"\rCreateProduct\x12\x15.CreateProductRequest\x1a\b.Product\x12)\n" +
 	"\n" +

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/go-sql-driver/mysql"
 	pb "github.com/logan2k02/ims/shared/protobuf"
@@ -54,12 +55,29 @@ func (s *productsStore) Close() error {
 }
 
 func (s *productsStore) Init() error {
-	_, err := s.db.Exec(`
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if err := tx.Rollback(); err != nil && err != sql.ErrTxDone {
+			Logger.LogError("init products store", "failed to rollback transaction: %v", err)
+		}
+	}()
+
+	_, err = tx.ExecContext(ctx, `
 	CREATE TABLE IF NOT EXISTS products (
-		id SERIAL PRIMARY KEY AUTO_INCREMENT,
+		id INT PRIMARY KEY AUTO_INCREMENT,
 		name VARCHAR(255) NOT NULL,
-		description TEXT,
+		sku VARCHAR(255) UNIQUE, 
+		description TEXT, 
 		price DECIMAL(10, 2) NOT NULL,
+		reorder_level INT DEFAULT 0,
+    	reorder_quantity INT DEFAULT 0,
+		stock_quantity INT NOT NULL DEFAULT 0,
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	);
 	`)
@@ -67,12 +85,12 @@ func (s *productsStore) Init() error {
 		return err
 	}
 
-	return nil
+	return tx.Commit()
 }
 
 func rowToProduct(row *sql.Row) (*pb.Product, error) {
 	var product pb.Product
-	if err := row.Scan(&product.Id, &product.Name, &product.Description, &product.Price, &product.CreatedAt); err != nil {
+	if err := row.Scan(&product.Id, &product.Name, &product.Sku, &product.Description, &product.Price, &product.ReorderLevel, &product.ReorderQuantity, &product.StockQuantity, &product.CreatedAt); err != nil {
 		return nil, err
 	}
 	return &product, nil
@@ -90,11 +108,11 @@ func (s *productsStore) CreateProduct(ctx context.Context, payload *pb.CreatePro
 	}()
 
 	query := `
-	INSERT INTO products (name, description, price)
-	VALUES (?, ?, ?)
+	INSERT INTO products (name, sku, description, price, reorder_level, reorder_quantity, stock_quantity)
+	VALUES (?,?,?,?,?,?,?)
 	`
 
-	result, err := tx.ExecContext(ctx, query, payload.Name, payload.Description, payload.Price)
+	result, err := tx.ExecContext(ctx, query, payload.Name, payload.Sku, payload.Description, payload.Price, payload.ReorderLevel, payload.ReorderQuantity, payload.InitialQuantity)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +122,7 @@ func (s *productsStore) CreateProduct(ctx context.Context, payload *pb.CreatePro
 		return nil, err
 	}
 
-	row := tx.QueryRowContext(ctx, `SELECT id, name, description, price, created_at FROM products WHERE id = ?`, insertedId)
+	row := tx.QueryRowContext(ctx, `SELECT id, name, sku, description, price, reorder_level, reorder_quantity, stock_quantity, created_at FROM products WHERE id = ?`, insertedId)
 
 	insertedProduct, err := rowToProduct(row)
 	if err != nil {
@@ -129,7 +147,7 @@ func (s *productsStore) GetProducts(ctx context.Context, ids []int64) ([]*pb.Pro
 		}
 	}()
 
-	query := "SELECT id,name,description,price,created_at FROM products"
+	query := "SELECT id,name,sku,description,price, reorder_level, reorder_quantity, stock_quantity,created_at FROM products"
 	args := make([]any, len(ids))
 	if len(ids) > 0 {
 		placeholders := make([]string, len(ids))
@@ -149,7 +167,7 @@ func (s *productsStore) GetProducts(ctx context.Context, ids []int64) ([]*pb.Pro
 	var products []*pb.Product
 	for rows.Next() {
 		var product pb.Product
-		if err := rows.Scan(&product.Id, &product.Name, &product.Description, &product.Price, &product.CreatedAt); err != nil {
+		if err := rows.Scan(&product.Id, &product.Name, &product.Sku, &product.Description, &product.Price, &product.ReorderLevel, &product.ReorderQuantity, &product.StockQuantity, &product.CreatedAt); err != nil {
 			return nil, err
 		}
 		products = append(products, &product)
@@ -199,16 +217,16 @@ func (s *productsStore) UpdateProduct(ctx context.Context, payload *pb.UpdatePro
 
 	query := `
 	UPDATE products
-	SET name = ?, description = ?, price = ?
+	SET name = ?,sku = ?, description = ?, price = ?, reorder_level=?, reorder_quantity=?
 	WHERE id = ?
 	`
 
-	_, err = tx.ExecContext(ctx, query, payload.Name, payload.Description, payload.Price, payload.Id)
+	_, err = tx.ExecContext(ctx, query, payload.Name, payload.Sku, payload.Description, payload.Price, payload.ReorderLevel, payload.ReorderQuantity, payload.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	row := tx.QueryRowContext(ctx, `SELECT id, name, description, price, created_at FROM products WHERE id = ?`, payload.Id)
+	row := tx.QueryRowContext(ctx, `SELECT id, name, sku, description, price,reorder_level,reorder_quantity,stock_quantity, created_at FROM products WHERE id = ?`, payload.Id)
 
 	updatedProduct, err := rowToProduct(row)
 	if err != nil {

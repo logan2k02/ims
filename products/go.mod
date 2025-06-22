@@ -5,7 +5,7 @@ go 1.24.4
 require (
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/joho/godotenv v1.5.1
-	github.com/logan2k02/ims/shared v0.0.0-20250622041756-8e6502fb592c
+	github.com/logan2k02/ims/shared v0.0.0-20250622102920-5c72d4e1e861
 	google.golang.org/grpc v1.73.0
 )
 

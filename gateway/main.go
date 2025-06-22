@@ -1,11 +1,10 @@
 package main
 
 import (
-	"log"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/logan2k02/ims/shared/consul"
 	"github.com/logan2k02/ims/shared/grpcservice"
+	"github.com/logan2k02/ims/shared/logger"
 	"github.com/logan2k02/ims/shared/protobuf"
 	"github.com/logan2k02/ims/shared/utils"
 )
@@ -13,6 +12,8 @@ import (
 var (
 	port       = utils.GetEnv("PORT", "3000")                  // Default HTTP port
 	consulAddr = utils.GetEnv("CONSUL_ADDR", "localhost:8500") // Default Consul address
+
+	Logger = logger.NewLogger("gateway service")
 )
 
 func main() {
@@ -24,20 +25,28 @@ func main() {
 
 	consulClient, err := consul.NewClient(consulAddr)
 	if err != nil {
-		log.Fatalf("failed to create consul client: %v", err)
+		Logger.FatalLog("consul init", "failed to create client: %v", err)
 	}
 
 	productsClientConn, err := grpcservice.GetGRPCConnection(consulClient, "products-grpc-service")
 	if err != nil {
-		log.Fatalf("failed to get gRPC connection for products-grpc-service: %v", err)
+		Logger.FatalLog("get products client connection", "failed to get gRPC connection: %v", err)
 	}
 	defer productsClientConn.Close()
 
 	productsClient := protobuf.NewProductsServiceClient(productsClientConn)
 
-	registerHandlers(app, &productsClient)
+	inventoryClientConn, err := grpcservice.GetGRPCConnection(consulClient, "inventory-grpc-service")
+	if err != nil {
+		Logger.FatalLog("get inventory client connection", "failed to get gRPC connection: %v", err)
+	}
+	defer inventoryClientConn.Close()
+
+	inventoryClient := protobuf.NewInventoryServiceClient(inventoryClientConn)
+
+	registerHandlers(app, productsClient, inventoryClient)
 
 	if err := app.Listen(":" + port); err != nil {
-		log.Fatalf("failed to start HTTP server: %v", err)
+		Logger.FatalLog("http server init", "failed to start HTTP server: %v", err)
 	}
 }
