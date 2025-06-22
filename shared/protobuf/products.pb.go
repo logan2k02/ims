@@ -7,12 +7,11 @@
 package protobuf
 
 import (
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
-
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
 const (
@@ -315,7 +314,7 @@ const file_products_proto_rawDesc = "" +
 	"\rCreateProduct\x12\x15.CreateProductRequest\x1a\b.Product\x12*\n" +
 	"\n" +
 	"GetProduct\x12\x12.GetProductRequest\x1a\b.Product\x12;\n" +
-	"\fListProducts\x12\x14.ListProductsRequest\x1a\x15.ListProductsResponseB3Z1github.com/theshawa/ims/shared/protobuf;protobufb\x06proto3"
+	"\fListProducts\x12\x14.ListProductsRequest\x1a\x15.ListProductsResponseB2Z0github.com/theshawa/ims/shared/protobuf;protobufb\x06proto3"
 
 var (
 	file_products_proto_rawDescOnce sync.Once
