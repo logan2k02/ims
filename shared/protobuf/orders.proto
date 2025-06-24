@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+option go_package = "github.com/logan2k02/ims/shared/protobuf;protobuf";
+
+service OrdersService {
+  rpc CreateOrder (CreateOrderRequest) returns (Order);
+  rpc GetOrder (OrderIdRequest) returns (Order);
+  rpc ListOrders (ListOrdersRequest) returns (ListOrdersResponse);
+  rpc DeleteOrder(OrderIdRequest) returns (DeleteOrderResponse);
+  rpc ChangeOrderStatus(ChangeOrderStatusRequest) returns (Order);
+}
+
+message CreateOrderRequest {
+  repeated OrderItem Items = 1;
+  string PaymentReference = 2;
+  string CustomerName = 3;
+  string CustomerContact = 4;
+}
+
+message OrderItem {
+  int64 ProductId = 1;
+  int64 Quantity = 2;
+}
+
+message Order {
+  int64 Id = 1;
+  string CustomerName = 2;
+  string CustomerContact = 3;
+  string PaymentReference = 4;
+  repeated OrderItem Items = 5;
+  string Status = 6; 
+  string CreatedAt =7;
+}
+
+message OrderIdRequest {
+  int64 Id = 1;
+}
+
+message ListOrdersRequest {
+  string Status = 1; // Optional filter by status
+  int64 Page = 3; // Optional limit for pagination
+  int64 PageSize = 4; // Optional offset for pagination
+}
+
+message ListOrdersResponse {
+  repeated Order Orders = 1;
+  int64 TotalCount = 2; // Total number of orders matching the criteria
+}
+
+message DeleteOrderResponse {}
+
+message ChangeOrderStatusRequest {
+  int64 Id = 1;
+  string Status = 2; // New status for the order
+}

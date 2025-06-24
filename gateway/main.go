@@ -44,7 +44,15 @@ func main() {
 
 	inventoryClient := protobuf.NewInventoryServiceClient(inventoryClientConn)
 
-	registerHandlers(app, productsClient, inventoryClient)
+	ordersClientConn, err := grpcservice.GetGRPCConnection(consulClient, "orders-grpc-service")
+	if err != nil {
+		Logger.FatalLog("get orders client connection", "failed to get gRPC connection: %v", err)
+	}
+	defer ordersClientConn.Close()
+
+	ordersClient := protobuf.NewOrdersServiceClient(ordersClientConn)
+
+	registerHandlers(app, productsClient, inventoryClient, ordersClient)
 
 	if err := app.Listen(":" + port); err != nil {
 		Logger.FatalLog("http server init", "failed to start HTTP server: %v", err)

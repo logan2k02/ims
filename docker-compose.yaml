@@ -14,7 +14,7 @@ services:
       MYSQL_USER: admin
       MYSQL_PASSWORD: 123456
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - ./.docker/mysql_data:/var/lib/mysql
   phpmyadmin:

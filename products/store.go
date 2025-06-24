@@ -31,6 +31,7 @@ func NewProductsStore() (*productsStore, error) {
 	cfg.Net = "tcp"
 	cfg.Addr = fmt.Sprintf("%s:%s", dbHost, dbPort)
 	cfg.DBName = dbName
+	cfg.Timeout = 50 * time.Second
 
 	conn, err := sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {
@@ -41,6 +42,9 @@ func NewProductsStore() (*productsStore, error) {
 	if err := conn.Ping(); err != nil {
 		return nil, err
 	}
+
+	conn.SetMaxIdleConns(0)
+	conn.SetMaxOpenConns(500)
 
 	return &productsStore{
 		db: conn,

@@ -85,7 +85,6 @@ func (s *inventoryStore) Init() error {
 	}
 
 	return tx.Commit()
-
 }
 
 type UpdateStockDto struct {
