@@ -2,8 +2,8 @@
 
 ## Todo
 
-1. Orders service
-2. Gateway orders handlers
+1. Orders service DONE
+2. Gateway orders handlers DONE
 3. Kafka server
 4. Kafka provider for orders service
 5. Kafka consumer for inventory service
